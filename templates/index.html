@@ -1,0 +1,752 @@
+{% extends "base.html" %}
+
+{% block title %}Security Policy Generator - Professional Policy Creation{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Hero Section -->
+        <div class="text-center mb-5">
+            <div class="mb-4">
+                <i class="fas fa-shield-halved text-primary" style="font-size: 4rem;"></i>
+            </div>
+            <h1 class="display-4 fw-bold text-primary mb-3">
+                Professional Security Policy Generator
+            </h1>
+            <p class="lead text-muted mb-4">
+                Create comprehensive, industry-specific security policies tailored to your organization's needs and compliance requirements.
+            </p>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="d-flex justify-content-center gap-4 flex-wrap">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <span class="small">ISO 27001 & 42001</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <span class="small">PCI DSS & SOC 2</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <span class="small">GDPR Compliance</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <span class="small">Industry-Specific</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Policy Generator Form -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-file-contract"></i>
+                    Generate Security Policy
+                </h3>
+            </div>
+            <div class="card-body">
+                <form id="policyForm">
+                    <!-- Organization Information -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-building"></i>
+                                Organization Information
+                            </h5>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="organization_name" class="form-label">
+                                <i class="fas fa-building"></i>
+                                Organization Name *
+                            </label>
+                            <input type="text" class="form-control" id="organization_name" name="organization_name" 
+                                   placeholder="Enter your organization name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="organization_size" class="form-label">
+                                <i class="fas fa-users"></i>
+                                Organization Size
+                            </label>
+                            <select class="form-select" id="organization_size" name="organization_size">
+                                <option value="">Select Organization Size</option>
+                                <option value="Small (1-50 employees)">Small (1-50 employees)</option>
+                                <option value="Medium (51-500 employees)">Medium (51-500 employees)</option>
+                                <option value="Large (501-5000 employees)">Large (501-5000 employees)</option>
+                                <option value="Enterprise (5000+ employees)">Enterprise (5000+ employees)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Industry and Framework Selection -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-industry"></i>
+                                Industry & Compliance Framework
+                            </h5>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="industry" class="form-label">
+                                <i class="fas fa-industry"></i>
+                                Industry Sectors *
+                            </label>
+                            <select class="form-select" id="industry" name="industry" multiple required>
+                                <option value="Technology/Software">Technology/Software</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Financial Services">Financial Services</option>
+                                <option value="Manufacturing">Manufacturing</option>
+                                <option value="Retail/E-commerce">Retail/E-commerce</option>
+                                <option value="Education">Education</option>
+                                <option value="Government">Government</option>
+                                <option value="Non-profit">Non-profit</option>
+                                <option value="Consulting">Consulting</option>
+                                <option value="Real Estate">Real Estate</option>
+                                <option value="Transportation">Transportation</option>
+                                <option value="Energy">Energy</option>
+                                <option value="Media/Entertainment">Media/Entertainment</option>
+                                <option value="Legal Services">Legal Services</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle"></i>
+                                Hold Ctrl (Windows) or Cmd (Mac) to select multiple industries
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="framework" class="form-label">
+                                <i class="fas fa-certificate"></i>
+                                Compliance Frameworks *
+                            </label>
+                            <select class="form-select" id="framework" name="framework" multiple required>
+                                <option value="iso27001">ISO 27001 - Information Security Management</option>
+                                <option value="iso42001">ISO 42001 - AI Management System</option>
+                                <option value="nist_ai_rmf">NIST AI RMF - AI Risk Management Framework</option>
+                                <option value="nist_sp_800_53">NIST SP 800-53 - Security and Privacy Controls</option>
+                                <option value="fedramp">FedRAMP - Federal Risk and Authorization Management</option>
+                                <option value="cis">CIS Controls - Critical Security Controls</option>
+                                <option value="pci">PCI DSS - Payment Card Industry</option>
+                                <option value="soc2">SOC 2 - Service Organization Control</option>
+                                <option value="gdpr">GDPR - General Data Protection Regulation</option>
+                            </select>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle"></i>
+                                Hold Ctrl (Windows) or Cmd (Mac) to select multiple frameworks
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Requirements -->
+                    <div class="mb-4">
+                        <label for="additional_requirements" class="form-label">
+                            <i class="fas fa-plus-circle"></i>
+                            Additional Requirements (Optional)
+                        </label>
+                        <textarea class="form-control" id="additional_requirements" name="additional_requirements" 
+                                  rows="4" placeholder="Any specific security requirements, considerations, or custom needs for your organization..."></textarea>
+                        <div class="form-text">
+                            <i class="fas fa-lightbulb"></i>
+                            Describe any specific security needs, industry regulations, or custom requirements
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-magic"></i>
+                            Generate Professional Policy
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="mt-4" style="display: none;">
+            <div class="card">
+                <div class="card-header" style="background: linear-gradient(135deg, var(--success-color) 0%, #047857 100%);">
+                    <h3 class="mb-0">
+                        <i class="fas fa-check-circle"></i>
+                        Policy Generated Successfully
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Policy Summary -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="fas fa-building text-primary"></i>
+                                <strong>Organization:</strong>
+                            </div>
+                            <span id="resultOrg" class="badge badge-primary"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="fas fa-certificate text-primary"></i>
+                                <strong>Framework:</strong>
+                            </div>
+                            <span id="resultFramework" class="badge badge-success"></span>
+                        </div>
+                    </div>
+
+                    <!-- Generated Policy Content -->
+                    <div class="mb-4">
+                        <label for="policyContent" class="form-label">
+                            <i class="fas fa-file-text"></i>
+                            Generated Policy Content
+                        </label>
+                        <textarea class="form-control" id="policyContent" rows="20" readonly 
+                                  style="font-family: 'Courier New', monospace; font-size: 0.9rem;"></textarea>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="text-center">
+                        <button type="button" class="btn btn-success" id="downloadBtn">
+                            <i class="fas fa-download"></i>
+                            Download Markdown
+                        </button>
+                        <button type="button" class="btn btn-primary ms-2" id="downloadPdfBtn">
+                            <i class="fas fa-file-pdf"></i>
+                            Download PDF
+                        </button>
+                        <button type="button" class="btn btn-info ms-2" id="generateControlsBtn">
+                            <i class="fas fa-cogs"></i>
+                            Generate Controls
+                        </button>
+                        <button type="button" class="btn btn-warning ms-2" id="generateImplementationBtn">
+                            <i class="fas fa-road"></i>
+                            Generate Implementation Guide
+                        </button>
+                        <button type="button" class="btn btn-dark ms-2" id="generateCompletePackageBtn">
+                            <i class="fas fa-box"></i>
+                            Generate Complete Package
+                        </button>
+                        <button type="button" class="btn btn-secondary ms-2" id="newPolicyBtn">
+                            <i class="fas fa-plus"></i>
+                            Generate New Policy
+                        </button>
+                    </div>
+                    
+                    <!-- Claude Features Status -->
+                    <div class="mt-3 text-center">
+                        <small class="text-muted">
+                            <i class="fas fa-robot"></i>
+                            AI-powered features require CLAUDE_API_KEY environment variable
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Section -->
+        <div id="loadingSection" class="mt-4 text-center" style="display: none;">
+            <div class="card">
+                <div class="card-body">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h5 class="text-primary mb-2">Generating Your Security Policy</h5>
+                    <p class="text-muted">Please wait while we create a comprehensive policy tailored to your organization...</p>
+                    <div class="loading-pulse">
+                        <small class="text-muted">This may take a few moments</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h4 class="text-center text-primary mb-4">Why Choose Our Policy Generator?</h4>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="fas fa-shield-alt text-primary mb-3" style="font-size: 2.5rem;"></i>
+                        <h5>Industry-Specific</h5>
+                        <p class="text-muted">Tailored policies for your specific industry with relevant controls and compliance requirements.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="fas fa-certificate text-primary mb-3" style="font-size: 2.5rem;"></i>
+                        <h5>Compliance Ready</h5>
+                        <p class="text-muted">Built-in compliance with major frameworks including ISO 27001, PCI DSS, SOC 2, and GDPR.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <i class="fas fa-file-pdf text-primary mb-3" style="font-size: 2.5rem;"></i>
+                        <h5>Professional Output</h5>
+                        <p class="text-muted">Download in Markdown or PDF format with professional formatting and structure.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('policyForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Show loading
+    document.getElementById('loadingSection').style.display = 'block';
+    document.getElementById('resultsSection').style.display = 'none';
+    
+    // Get multiple selected values
+    const selectedIndustries = Array.from(document.getElementById('industry').selectedOptions).map(option => option.value);
+    const selectedFrameworks = Array.from(document.getElementById('framework').selectedOptions).map(option => option.value);
+    
+    // Validate selections
+    if (selectedIndustries.length === 0) {
+        showError('Please select at least one industry.');
+        document.getElementById('loadingSection').style.display = 'none';
+        return;
+    }
+    
+    if (selectedFrameworks.length === 0) {
+        showError('Please select at least one compliance framework.');
+        document.getElementById('loadingSection').style.display = 'none';
+        return;
+    }
+    
+    const formData = {
+        organization_name: document.getElementById('organization_name').value,
+        industry: selectedIndustries,
+        framework: selectedFrameworks,
+        organization_size: document.getElementById('organization_size').value,
+        additional_requirements: document.getElementById('additional_requirements').value
+    };
+    
+    // Debug logging
+    console.log('Form data being sent:', formData);
+    
+    try {
+        const response = await fetch('/generate_policy', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        console.log('Content-Type:', contentType);
+        
+        if (!contentType || !contentType.includes('application/json')) {
+            // Response is not JSON, get the text
+            const textResponse = await response.text();
+            console.log('Non-JSON response:', textResponse);
+            throw new Error('Server returned non-JSON response: ' + textResponse.substring(0, 200));
+        }
+        
+        const result = await response.json();
+        console.log('Response data:', result);
+        
+        if (result.success) {
+            document.getElementById('resultOrg').textContent = result.organization_name;
+            document.getElementById('resultFramework').textContent = Array.isArray(result.framework) ? result.framework.join(', ') : result.framework;
+            document.getElementById('policyContent').value = result.policy_content;
+            document.getElementById('resultsSection').style.display = 'block';
+            
+            // Smooth scroll to results
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+        } else {
+            showError(result.error);
+        }
+    } catch (error) {
+        console.error('Error details:', error);
+        showError('Error generating policy: ' + error.message);
+    } finally {
+        document.getElementById('loadingSection').style.display = 'none';
+    }
+});
+
+function showError(message) {
+    // Create a more visible error message
+    const errorDiv = document.createElement('div');
+    errorDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        color: #991b1b;
+        padding: 1.5rem;
+        border-radius: 12px;
+        z-index: 10000;
+        max-width: 500px;
+        text-align: center;
+        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
+        border: 1px solid #fca5a5;
+    `;
+    errorDiv.innerHTML = `
+        <h5 class="mb-3"><i class="fas fa-exclamation-triangle"></i> Error</h5>
+        <p class="mb-3">${message}</p>
+        <button onclick="this.parentElement.remove()" class="btn btn-danger btn-sm">
+            <i class="fas fa-times"></i> Close
+        </button>
+    `;
+    document.body.appendChild(errorDiv);
+}
+
+document.getElementById('downloadBtn').addEventListener('click', async function() {
+    const policyContent = document.getElementById('policyContent').value;
+    const filename = document.getElementById('resultOrg').textContent.replace(/\s+/g, '_') + '_Security_Policy.md';
+    
+    try {
+        const response = await fetch('/download_policy', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                policy_content: policyContent,
+                filename: filename
+            })
+        });
+        
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } else {
+            showError('Error downloading policy');
+        }
+    } catch (error) {
+        showError('Error downloading policy: ' + error.message);
+    }
+});
+
+document.getElementById('downloadPdfBtn').addEventListener('click', async function() {
+    const policyContent = document.getElementById('policyContent').value;
+    const filename = document.getElementById('resultOrg').textContent.replace(/\s+/g, '_') + '_Security_Policy.md';
+    
+    try {
+        const response = await fetch('/download_pdf', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                policy_content: policyContent,
+                filename: filename
+            })
+        });
+        
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename.replace('.md', '.pdf');
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } else {
+            showError('Error downloading PDF');
+        }
+    } catch (error) {
+        showError('Error downloading PDF: ' + error.message);
+    }
+});
+
+document.getElementById('newPolicyBtn').addEventListener('click', function() {
+    document.getElementById('policyForm').reset();
+    document.getElementById('resultsSection').style.display = 'none';
+    document.getElementById('loadingSection').style.display = 'none';
+    
+    // Reset selection counts
+    updateSelectionCount(document.getElementById('industry'), document.querySelector('label[for="industry"]'));
+    updateSelectionCount(document.getElementById('framework'), document.querySelector('label[for="framework"]'));
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// Add visual feedback for multiple selections
+function updateSelectionCount(selectElement, labelElement) {
+    const selectedCount = selectElement.selectedOptions.length;
+    const originalText = labelElement.textContent.split(' (')[0];
+    
+    if (selectedCount > 0) {
+        labelElement.innerHTML = `<i class="fas fa-${labelElement.querySelector('i').className.split('-')[2]}"></i> ${originalText} <span class="badge badge-primary ms-2">${selectedCount} selected</span>`;
+    } else {
+        labelElement.innerHTML = `<i class="fas fa-${labelElement.querySelector('i').className.split('-')[2]}"></i> ${originalText} *`;
+    }
+}
+
+document.getElementById('industry').addEventListener('change', function() {
+    updateSelectionCount(this, this.previousElementSibling);
+});
+
+document.getElementById('framework').addEventListener('change', function() {
+    updateSelectionCount(this, this.previousElementSibling);
+});
+
+// Initialize selection counts
+document.addEventListener('DOMContentLoaded', function() {
+    updateSelectionCount(document.getElementById('industry'), document.querySelector('label[for="industry"]'));
+    updateSelectionCount(document.getElementById('framework'), document.querySelector('label[for="framework"]'));
+});
+
+// Claude-powered features
+document.getElementById('generateControlsBtn').addEventListener('click', async function() {
+    const policyContent = document.getElementById('policyContent').value;
+    const selectedIndustries = Array.from(document.getElementById('industry').selectedOptions).map(option => option.value);
+    const selectedFrameworks = Array.from(document.getElementById('framework').selectedOptions).map(option => option.value);
+    
+    if (!policyContent) {
+        showError('Please generate a policy first before creating controls.');
+        return;
+    }
+    
+    // Show loading
+    this.disabled = true;
+    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Controls...';
+    
+    try {
+        const response = await fetch('/generate_controls', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                policy_content: policyContent,
+                framework: selectedFrameworks,
+                industry: selectedIndustries
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Create a new textarea for controls
+            const controlsSection = document.createElement('div');
+            controlsSection.className = 'mt-4';
+            controlsSection.innerHTML = `
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h4 class="mb-0"><i class="fas fa-cogs"></i> Security Controls Generated by Claude</h4>
+                    </div>
+                    <div class="card-body">
+                        <textarea class="form-control" rows="15" readonly style="font-family: 'Courier New', monospace; font-size: 0.9rem;">${result.controls_content}</textarea>
+                        <div class="text-center mt-3">
+                            <button class="btn btn-info" onclick="downloadContent('${result.controls_content.replace(/'/g, "\\'")}', 'security_controls.md')">
+                                <i class="fas fa-download"></i> Download Controls
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('resultsSection').appendChild(controlsSection);
+            controlsSection.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            showError(result.error);
+        }
+    } catch (error) {
+        showError('Error generating controls: ' + error.message);
+    } finally {
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-cogs"></i> Generate Controls';
+    }
+});
+
+document.getElementById('generateImplementationBtn').addEventListener('click', async function() {
+    const policyContent = document.getElementById('policyContent').value;
+    const organizationSize = document.getElementById('organization_size').value;
+    
+    if (!policyContent) {
+        showError('Please generate a policy first before creating implementation guide.');
+        return;
+    }
+    
+    // Show loading
+    this.disabled = true;
+    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Implementation Guide...';
+    
+    try {
+        const response = await fetch('/generate_implementation_guide', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                policy_content: policyContent,
+                controls_content: '', // Will be generated if needed
+                organization_size: organizationSize
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Create a new textarea for implementation guide
+            const implementationSection = document.createElement('div');
+            implementationSection.className = 'mt-4';
+            implementationSection.innerHTML = `
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h4 class="mb-0"><i class="fas fa-road"></i> Implementation Guide Generated by Claude</h4>
+                    </div>
+                    <div class="card-body">
+                        <textarea class="form-control" rows="15" readonly style="font-family: 'Courier New', monospace; font-size: 0.9rem;">${result.implementation_guide}</textarea>
+                        <div class="text-center mt-3">
+                            <button class="btn btn-warning" onclick="downloadContent('${result.implementation_guide.replace(/'/g, "\\'")}', 'implementation_guide.md')">
+                                <i class="fas fa-download"></i> Download Implementation Guide
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('resultsSection').appendChild(implementationSection);
+            implementationSection.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            showError(result.error);
+        }
+    } catch (error) {
+        showError('Error generating implementation guide: ' + error.message);
+    } finally {
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-road"></i> Generate Implementation Guide';
+    }
+});
+
+document.getElementById('generateCompletePackageBtn').addEventListener('click', async function() {
+    const organizationName = document.getElementById('organization_name').value;
+    const selectedIndustries = Array.from(document.getElementById('industry').selectedOptions).map(option => option.value);
+    const selectedFrameworks = Array.from(document.getElementById('framework').selectedOptions).map(option => option.value);
+    const organizationSize = document.getElementById('organization_size').value;
+    const additionalRequirements = document.getElementById('additional_requirements').value;
+    
+    if (!organizationName || selectedIndustries.length === 0 || selectedFrameworks.length === 0) {
+        showError('Please fill in all required fields before generating complete package.');
+        return;
+    }
+    
+    // Show loading
+    this.disabled = true;
+    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Complete Package...';
+    
+    try {
+        const response = await fetch('/generate_complete_package', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                organization_name: organizationName,
+                industry: selectedIndustries,
+                framework: selectedFrameworks,
+                organization_size: organizationSize,
+                additional_requirements: additionalRequirements
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Create sections for all generated content
+            const packageSection = document.createElement('div');
+            packageSection.className = 'mt-4';
+            packageSection.innerHTML = `
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h4 class="mb-0"><i class="fas fa-box"></i> Complete Security Package Generated by Claude</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white">
+                                        <h6 class="mb-0"><i class="fas fa-file-contract"></i> Security Policy</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <textarea class="form-control" rows="8" readonly style="font-family: 'Courier New', monospace; font-size: 0.8rem;">${result.package.policy.substring(0, 500)}...</textarea>
+                                        <button class="btn btn-primary btn-sm mt-2" onclick="downloadContent('${result.package.policy.replace(/'/g, "\\'")}', '${result.filenames.policy}')">
+                                            <i class="fas fa-download"></i> Download Policy
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <div class="card-header bg-info text-white">
+                                        <h6 class="mb-0"><i class="fas fa-cogs"></i> Security Controls</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <textarea class="form-control" rows="8" readonly style="font-family: 'Courier New', monospace; font-size: 0.8rem;">${result.package.controls.substring(0, 500)}...</textarea>
+                                        <button class="btn btn-info btn-sm mt-2" onclick="downloadContent('${result.package.controls.replace(/'/g, "\\'")}', '${result.filenames.controls}')">
+                                            <i class="fas fa-download"></i> Download Controls
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card">
+                                    <div class="card-header bg-warning text-dark">
+                                        <h6 class="mb-0"><i class="fas fa-road"></i> Implementation Guide</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <textarea class="form-control" rows="8" readonly style="font-family: 'Courier New', monospace; font-size: 0.8rem;">${result.package.implementation_guide.substring(0, 500)}...</textarea>
+                                        <button class="btn btn-warning btn-sm mt-2" onclick="downloadContent('${result.package.implementation_guide.replace(/'/g, "\\'")}', '${result.filenames.implementation}')">
+                                            <i class="fas fa-download"></i> Download Guide
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('resultsSection').appendChild(packageSection);
+            packageSection.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            showError(result.error);
+        }
+    } catch (error) {
+        showError('Error generating complete package: ' + error.message);
+    } finally {
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-box"></i> Generate Complete Package';
+    }
+});
+
+// Helper function to download content
+function downloadContent(content, filename) {
+    const blob = new Blob([content], { type: 'text/markdown' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+}
+</script>
+{% endblock %} 
