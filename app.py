@@ -12,6 +12,8 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
+import ipaddress
+import sys
 
 # Set the correct template folder path
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
@@ -449,9 +451,32 @@ def generate_complete_package():
         }), 500
 
 if __name__ == '__main__':
-    # Configure for HTTP (temporarily disable SSL for testing)
-    app.run(
-        debug=True, 
-        host='0.0.0.0', 
-        port=5013
-    ) 
+    # Configure for HTTPS with SSL certificates
+    ssl_context = None
+    
+    # Check if SSL certificates exist
+    cert_file = 'ssl/cert.pem'
+    key_file = 'ssl/key.pem'
+    
+    if os.path.exists(cert_file) and os.path.exists(key_file):
+        ssl_context = (cert_file, key_file)
+        print("SSL certificates found. Running with HTTPS...")
+    else:
+        print("SSL certificates not found.")
+        print("To enable HTTPS, run: python generate_ssl_cert.py")
+        print("Running without HTTPS...")
+    
+    # Run the app with HTTPS if SSL context is available
+    if ssl_context:
+        app.run(
+            debug=True, 
+            host='0.0.0.0', 
+            port=5014,
+            ssl_context=ssl_context
+        )
+    else:
+        app.run(
+            debug=True, 
+            host='0.0.0.0', 
+            port=5014
+        ) 
