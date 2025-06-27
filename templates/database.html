@@ -302,8 +302,8 @@ function displayPolicies(policies) {
                             Generated: ${generatedDate} | Type: ${policy.generator_type}
                         </small>
                     </div>
-                    <button class="btn btn-primary btn-sm" onclick="downloadContent('${policy.content.replace(/'/g, "\\'")}', '${policy.filename || 'policy.md'}')">
-                        <i class="fas fa-download"></i> Download
+                    <button class="btn btn-primary btn-sm" onclick="downloadContentAsPdf('${policy.content.replace(/'/g, "\\'")}', '${policy.filename || 'policy.pdf'}')">
+                        <i class="fas fa-file-pdf"></i> Download PDF
                     </button>
                 </div>
                 <div class="card-body">
@@ -341,8 +341,8 @@ function displayControls(controls) {
                             Generated: ${generatedDate}
                         </small>
                     </div>
-                    <button class="btn btn-info btn-sm" onclick="downloadContent('${control.content.replace(/'/g, "\\'")}', '${control.filename || 'controls.md'}')">
-                        <i class="fas fa-download"></i> Download
+                    <button class="btn btn-info btn-sm" onclick="downloadContentAsPdf('${control.content.replace(/'/g, "\\'")}', '${control.filename || 'controls.pdf'}')">
+                        <i class="fas fa-file-pdf"></i> Download PDF
                     </button>
                 </div>
                 <div class="card-body">
@@ -380,8 +380,8 @@ function displayGuides(guides) {
                             Generated: ${generatedDate}
                         </small>
                     </div>
-                    <button class="btn btn-warning btn-sm" onclick="downloadContent('${guide.content.replace(/'/g, "\\'")}', '${guide.filename || 'implementation_guide.md'}')">
-                        <i class="fas fa-download"></i> Download
+                    <button class="btn btn-warning btn-sm" onclick="downloadContentAsPdf('${guide.content.replace(/'/g, "\\'")}', '${guide.filename || 'implementation_guide.pdf'}')">
+                        <i class="fas fa-file-pdf"></i> Download PDF
                     </button>
                 </div>
                 <div class="card-body">
@@ -394,16 +394,37 @@ function displayGuides(guides) {
     container.innerHTML = html;
 }
 
-function downloadContent(content, filename) {
-    const blob = new Blob([content], { type: 'text/markdown' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+function downloadContentAsPdf(content, filename) {
+    fetch('/convert_to_pdf', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            content: content,
+            filename: filename
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.blob();
+        } else {
+            throw new Error('Error generating PDF');
+        }
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    })
+    .catch(error => {
+        showError('Error downloading PDF: ' + error.message);
+    });
 }
 
 function showError(message) {

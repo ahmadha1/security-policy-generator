@@ -206,7 +206,7 @@ def generate_policy():
         # Save policy to database
         try:
             policy_db.save_organization(
-                organization_name=organization_name,
+                name=organization_name,
                 industry=industry,
                 framework=framework,
                 organization_size=organization_size
@@ -285,6 +285,31 @@ def download_pdf():
             pdf_path,
             as_attachment=True,
             download_name=filename.replace('.md', '.pdf'),
+            mimetype='application/pdf'
+        )
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Error generating PDF: {str(e)}'
+        }), 500
+
+@app.route('/convert_to_pdf', methods=['POST'])
+@csrf.exempt
+def convert_to_pdf():
+    """Convert any content to PDF for download"""
+    try:
+        data = request.get_json()
+        content = data.get('content', '')
+        filename = data.get('filename', 'document.pdf')
+        
+        # Convert content to PDF
+        pdf_path = markdown_to_pdf(content, filename)
+        
+        return send_file(
+            pdf_path,
+            as_attachment=True,
+            download_name=filename,
             mimetype='application/pdf'
         )
         

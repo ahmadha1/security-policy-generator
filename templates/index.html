@@ -184,11 +184,7 @@
                     <div class="text-center">
                         <!-- Download Buttons Row -->
                         <div class="mb-3">
-                            <button type="button" class="btn btn-success" id="downloadBtn">
-                                <i class="fas fa-download"></i>
-                                Download Markdown
-                            </button>
-                            <button type="button" class="btn btn-primary ms-2" id="downloadPdfBtn">
+                            <button type="button" class="btn btn-primary" id="downloadPdfBtn">
                                 <i class="fas fa-file-pdf"></i>
                                 Download PDF
                             </button>
@@ -385,40 +381,6 @@ function showError(message) {
     document.body.appendChild(errorDiv);
 }
 
-document.getElementById('downloadBtn').addEventListener('click', async function() {
-    const policyContent = document.getElementById('policyContent').value;
-    const filename = document.getElementById('resultOrg').textContent.replace(/\s+/g, '_') + '_Security_Policy.md';
-    
-    try {
-        const response = await fetch('/download_policy', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                policy_content: policyContent,
-                filename: filename
-            })
-        });
-        
-        if (response.ok) {
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-        } else {
-            showError('Error downloading policy');
-        }
-    } catch (error) {
-        showError('Error downloading policy: ' + error.message);
-    }
-});
-
 document.getElementById('downloadPdfBtn').addEventListener('click', async function() {
     const policyContent = document.getElementById('policyContent').value;
     const filename = document.getElementById('resultOrg').textContent.replace(/\s+/g, '_') + '_Security_Policy.md';
@@ -556,8 +518,8 @@ document.getElementById('generateControlsBtn').addEventListener('click', async f
                     <div class="card-body">
                         <textarea class="form-control" rows="15" readonly style="font-family: 'Courier New', monospace; font-size: 0.9rem;">${result.controls_content}</textarea>
                         <div class="text-center mt-3">
-                            <button class="btn btn-info" onclick="downloadContent('${result.controls_content.replace(/'/g, "\\'")}', 'security_controls.md')">
-                                <i class="fas fa-download"></i> Download Controls
+                            <button class="btn btn-info" onclick="downloadContentAsPdf('${result.controls_content.replace(/'/g, "\\'")}', 'security_controls.pdf')">
+                                <i class="fas fa-file-pdf"></i> Download Controls PDF
                             </button>
                         </div>
                     </div>
@@ -639,8 +601,8 @@ document.getElementById('generateImplementationBtn').addEventListener('click', a
                     <div class="card-body">
                         <textarea class="form-control" rows="15" readonly style="font-family: 'Courier New', monospace; font-size: 0.9rem;">${result.implementation_guide}</textarea>
                         <div class="text-center mt-3">
-                            <button class="btn btn-warning" onclick="downloadContent('${result.implementation_guide.replace(/'/g, "\\'")}', 'implementation_guide.md')">
-                                <i class="fas fa-download"></i> Download Implementation Guide
+                            <button class="btn btn-warning" onclick="downloadContentAsPdf('${result.implementation_guide.replace(/'/g, "\\'")}', 'implementation_guide.pdf')">
+                                <i class="fas fa-file-pdf"></i> Download Implementation Guide PDF
                             </button>
                         </div>
                     </div>
@@ -711,8 +673,8 @@ document.getElementById('generateCompletePackageBtn').addEventListener('click', 
                                     </div>
                                     <div class="card-body">
                                         <textarea class="form-control" rows="8" readonly style="font-family: 'Courier New', monospace; font-size: 0.8rem;">${result.package.policy.substring(0, 500)}...</textarea>
-                                        <button class="btn btn-primary btn-sm mt-2" onclick="downloadContent('${result.package.policy.replace(/'/g, "\\'")}', '${result.filenames.policy}')">
-                                            <i class="fas fa-download"></i> Download Policy
+                                        <button class="btn btn-primary btn-sm mt-2" onclick="downloadContentAsPdf('${result.package.policy.replace(/'/g, "\\'")}', '${result.filenames.policy.replace('.md', '.pdf')}')">
+                                            <i class="fas fa-file-pdf"></i> Download Policy PDF
                                         </button>
                                     </div>
                                 </div>
@@ -724,8 +686,8 @@ document.getElementById('generateCompletePackageBtn').addEventListener('click', 
                                     </div>
                                     <div class="card-body">
                                         <textarea class="form-control" rows="8" readonly style="font-family: 'Courier New', monospace; font-size: 0.8rem;">${result.package.controls.substring(0, 500)}...</textarea>
-                                        <button class="btn btn-info btn-sm mt-2" onclick="downloadContent('${result.package.controls.replace(/'/g, "\\'")}', '${result.filenames.controls}')">
-                                            <i class="fas fa-download"></i> Download Controls
+                                        <button class="btn btn-info btn-sm mt-2" onclick="downloadContentAsPdf('${result.package.controls.replace(/'/g, "\\'")}', '${result.filenames.controls.replace('.md', '.pdf')}')">
+                                            <i class="fas fa-file-pdf"></i> Download Controls PDF
                                         </button>
                                     </div>
                                 </div>
@@ -737,8 +699,8 @@ document.getElementById('generateCompletePackageBtn').addEventListener('click', 
                                     </div>
                                     <div class="card-body">
                                         <textarea class="form-control" rows="8" readonly style="font-family: 'Courier New', monospace; font-size: 0.8rem;">${result.package.implementation_guide.substring(0, 500)}...</textarea>
-                                        <button class="btn btn-warning btn-sm mt-2" onclick="downloadContent('${result.package.implementation_guide.replace(/'/g, "\\'")}', '${result.filenames.implementation}')">
-                                            <i class="fas fa-download"></i> Download Guide
+                                        <button class="btn btn-warning btn-sm mt-2" onclick="downloadContentAsPdf('${result.package.implementation_guide.replace(/'/g, "\\'")}', '${result.filenames.implementation.replace('.md', '.pdf')}')">
+                                            <i class="fas fa-file-pdf"></i> Download Guide PDF
                                         </button>
                                     </div>
                                 </div>
@@ -772,6 +734,39 @@ function downloadContent(content, filename) {
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
+}
+
+function downloadContentAsPdf(content, filename) {
+    fetch('/convert_to_pdf', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            content: content,
+            filename: filename
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.blob();
+        } else {
+            throw new Error('Error generating PDF');
+        }
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    })
+    .catch(error => {
+        showError('Error downloading PDF: ' + error.message);
+    });
 }
 </script>
 {% endblock %} 
