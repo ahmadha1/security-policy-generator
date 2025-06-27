@@ -182,30 +182,41 @@
 
                     <!-- Action Buttons -->
                     <div class="text-center">
-                        <button type="button" class="btn btn-success" id="downloadBtn">
-                            <i class="fas fa-download"></i>
-                            Download Markdown
-                        </button>
-                        <button type="button" class="btn btn-primary ms-2" id="downloadPdfBtn">
-                            <i class="fas fa-file-pdf"></i>
-                            Download PDF
-                        </button>
-                        <button type="button" class="btn btn-info ms-2" id="generateControlsBtn">
-                            <i class="fas fa-cogs"></i>
-                            Generate Controls
-                        </button>
-                        <button type="button" class="btn btn-warning ms-2" id="generateImplementationBtn">
-                            <i class="fas fa-road"></i>
-                            Generate Implementation Guide
-                        </button>
-                        <button type="button" class="btn btn-dark ms-2" id="generateCompletePackageBtn">
-                            <i class="fas fa-box"></i>
-                            Generate Complete Package
-                        </button>
-                        <button type="button" class="btn btn-secondary ms-2" id="newPolicyBtn">
-                            <i class="fas fa-plus"></i>
-                            Generate New Policy
-                        </button>
+                        <!-- Download Buttons Row -->
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-success" id="downloadBtn">
+                                <i class="fas fa-download"></i>
+                                Download Markdown
+                            </button>
+                            <button type="button" class="btn btn-primary ms-2" id="downloadPdfBtn">
+                                <i class="fas fa-file-pdf"></i>
+                                Download PDF
+                            </button>
+                        </div>
+                        
+                        <!-- AI Generation Buttons Row -->
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-info" id="generateControlsBtn">
+                                <i class="fas fa-cogs"></i>
+                                Generate Controls
+                            </button>
+                            <button type="button" class="btn btn-warning ms-2" id="generateImplementationBtn">
+                                <i class="fas fa-road"></i>
+                                Generate Implementation Guide
+                            </button>
+                            <button type="button" class="btn btn-dark ms-2" id="generateCompletePackageBtn">
+                                <i class="fas fa-box"></i>
+                                Generate Complete Package
+                            </button>
+                        </div>
+                        
+                        <!-- New Policy Button Row -->
+                        <div>
+                            <button type="button" class="btn btn-secondary" id="newPolicyBtn">
+                                <i class="fas fa-plus"></i>
+                                Generate New Policy
+                            </button>
+                        </div>
                     </div>
                     
                     <!-- Claude Features Status -->
