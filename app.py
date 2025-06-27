@@ -327,6 +327,8 @@ def get_frameworks():
         {'id': 'iso42001', 'name': 'ISO 42001', 'description': 'AI Management System'},
         {'id': 'nist_ai_rmf', 'name': 'NIST AI RMF', 'description': 'NIST Artificial Intelligence Risk Management Framework'},
         {'id': 'nist_sp_800_53', 'name': 'NIST SP 800-53', 'description': 'NIST Special Publication 800-53 - Security and Privacy Controls'},
+        {'id': 'nist_csf', 'name': 'NIST CSF', 'description': 'NIST Cybersecurity Framework'},
+        {'id': 'hitrust', 'name': 'HITRUST CSF', 'description': 'HITRUST Common Security Framework'},
         {'id': 'fedramp', 'name': 'FedRAMP', 'description': 'Federal Risk and Authorization Management Program'},
         {'id': 'cis', 'name': 'CIS Controls', 'description': 'Center for Internet Security Critical Security Controls'},
         {'id': 'pci', 'name': 'PCI DSS', 'description': 'Payment Card Industry Data Security Standard'},
