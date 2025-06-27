@@ -333,7 +333,10 @@ def get_frameworks():
         {'id': 'cis', 'name': 'CIS Controls', 'description': 'Center for Internet Security Critical Security Controls'},
         {'id': 'pci', 'name': 'PCI DSS', 'description': 'Payment Card Industry Data Security Standard'},
         {'id': 'soc2', 'name': 'SOC 2', 'description': 'Service Organization Control 2'},
-        {'id': 'gdpr', 'name': 'GDPR', 'description': 'General Data Protection Regulation'}
+        {'id': 'gdpr', 'name': 'GDPR', 'description': 'General Data Protection Regulation'},
+        {'id': 'owasp', 'name': 'OWASP', 'description': 'Open Web Application Security Project - Application Security Framework'},
+        {'id': 'itil', 'name': 'ITIL', 'description': 'Information Technology Infrastructure Library - IT Service Management'},
+        {'id': 'csa', 'name': 'CSA', 'description': 'Cloud Security Alliance - Cloud Security Framework'}
     ]
     return jsonify(frameworks)
 

@@ -246,6 +246,87 @@ class SecurityPolicyGenerator:
                     'Business Continuity',
                     'Privacy by Design'
                 ]
+            },
+            'owasp': {
+                'name': 'OWASP',
+                'description': 'Open Web Application Security Project - Application Security Framework',
+                'controls': [
+                    'Injection Prevention',
+                    'Broken Authentication',
+                    'Sensitive Data Exposure',
+                    'XML External Entities (XXE)',
+                    'Broken Access Control',
+                    'Security Misconfiguration',
+                    'Cross-Site Scripting (XSS)',
+                    'Insecure Deserialization',
+                    'Using Components with Known Vulnerabilities',
+                    'Insufficient Logging & Monitoring',
+                    'Server-Side Request Forgery (SSRF)',
+                    'Software and Data Integrity Failures',
+                    'Security Logging Failures',
+                    'Vulnerable and Outdated Components',
+                    'Identification and Authentication Failures',
+                    'Software and Data Integrity Failures',
+                    'Security Headers',
+                    'Input Validation',
+                    'Output Encoding',
+                    'Session Management'
+                ]
+            },
+            'itil': {
+                'name': 'ITIL',
+                'description': 'Information Technology Infrastructure Library - IT Service Management',
+                'controls': [
+                    'Service Strategy',
+                    'Service Design',
+                    'Service Transition',
+                    'Service Operation',
+                    'Continual Service Improvement',
+                    'Change Management',
+                    'Incident Management',
+                    'Problem Management',
+                    'Release Management',
+                    'Configuration Management',
+                    'Service Level Management',
+                    'Capacity Management',
+                    'Availability Management',
+                    'IT Service Continuity Management',
+                    'Information Security Management',
+                    'Supplier Management',
+                    'Financial Management',
+                    'Knowledge Management',
+                    'Service Catalog Management',
+                    'Request Fulfillment'
+                ]
+            },
+            'csa': {
+                'name': 'CSA',
+                'description': 'Cloud Security Alliance - Cloud Security Framework',
+                'controls': [
+                    'Cloud Architecture',
+                    'Identity and Access Management',
+                    'Data Security and Privacy',
+                    'Application Security',
+                    'Infrastructure Security',
+                    'Virtualization Security',
+                    'Compliance and Audit',
+                    'Incident Response',
+                    'Business Continuity',
+                    'Risk Management',
+                    'Governance and Enterprise Risk Management',
+                    'Legal and Electronic Discovery',
+                    'Compliance and Audit Management',
+                    'Information Management and Data Security',
+                    'Interoperability and Portability',
+                    'Traditional Security, Business Continuity, and Disaster Recovery',
+                    'Data Center Operations',
+                    'Incident Response, Notification, and Remediation',
+                    'Application Security',
+                    'Encryption and Key Management',
+                    'Identity, Entitlement, and Access Management',
+                    'Virtualization',
+                    'Security as a Service'
+                ]
             }
         }
         
