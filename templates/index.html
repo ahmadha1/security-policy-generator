@@ -523,6 +523,28 @@ document.getElementById('generateControlsBtn').addEventListener('click', async f
         const result = await response.json();
         
         if (result.success) {
+            // Save controls to database
+            const organizationName = document.getElementById('resultOrg').textContent;
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const filename = `${organizationName.replace(/\s+/g, '_')}_controls_${timestamp}.md`;
+            
+            try {
+                await fetch('/save_controls', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        organization_name: organizationName,
+                        controls_content: result.controls_content,
+                        filename: filename
+                    })
+                });
+                console.log('Controls saved to database');
+            } catch (error) {
+                console.warn('Could not save controls to database:', error);
+            }
+            
             // Create a new textarea for controls
             const controlsSection = document.createElement('div');
             controlsSection.className = 'mt-4';
@@ -584,6 +606,28 @@ document.getElementById('generateImplementationBtn').addEventListener('click', a
         const result = await response.json();
         
         if (result.success) {
+            // Save implementation guide to database
+            const organizationName = document.getElementById('resultOrg').textContent;
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const filename = `${organizationName.replace(/\s+/g, '_')}_implementation_guide_${timestamp}.md`;
+            
+            try {
+                await fetch('/save_implementation_guide', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        organization_name: organizationName,
+                        guide_content: result.implementation_guide,
+                        filename: filename
+                    })
+                });
+                console.log('Implementation guide saved to database');
+            } catch (error) {
+                console.warn('Could not save implementation guide to database:', error);
+            }
+            
             // Create a new textarea for implementation guide
             const implementationSection = document.createElement('div');
             implementationSection.className = 'mt-4';

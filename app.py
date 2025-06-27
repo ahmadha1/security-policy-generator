@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 from policy_generator import SecurityPolicyGenerator
 from claude_policy_generator import ClaudePolicyGenerator
+from policy_database import PolicyDatabase
 import ssl
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
@@ -29,6 +30,9 @@ ssl_context.check_hostname = True
 # Initialize the policy generators
 policy_generator = SecurityPolicyGenerator()
 claude_generator = None
+
+# Initialize the policy database
+policy_db = PolicyDatabase()
 
 # Try to initialize Claude generator if API key is available
 try:
@@ -133,6 +137,11 @@ def index():
     """Main page with the policy generator form"""
     return render_template('index.html')
 
+@app.route('/database')
+def database():
+    """Database page to view saved policies and controls"""
+    return render_template('database.html')
+
 @app.route('/generate_policy', methods=['POST'])
 @csrf.exempt
 def generate_policy():
@@ -193,6 +202,24 @@ def generate_policy():
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         framework_str = "_".join(framework) if isinstance(framework, list) else framework
         filename = f"{organization_name.replace(' ', '_')}_{framework_str}_{timestamp}.md"
+        
+        # Save policy to database
+        try:
+            policy_db.save_organization(
+                organization_name=organization_name,
+                industry=industry,
+                framework=framework,
+                organization_size=organization_size
+            )
+            policy_db.save_policy(
+                organization_name=organization_name,
+                policy_content=policy_content,
+                filename=filename,
+                generator_type='claude' if claude_generator else 'standard'
+            )
+            print(f"Policy saved to database for organization: {organization_name}")
+        except Exception as e:
+            print(f"Warning: Could not save policy to database: {e}")
         
         return jsonify({
             'success': True,
@@ -448,6 +475,136 @@ def generate_complete_package():
         return jsonify({
             'success': False,
             'error': f'Error generating complete package: {str(e)}'
+        }), 500
+
+@app.route('/api/organizations')
+def get_organizations():
+    """Get all organizations from database"""
+    try:
+        organizations = policy_db.get_organizations()
+        return jsonify({
+            'success': True,
+            'organizations': organizations
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Error fetching organizations: {str(e)}'
+        }), 500
+
+@app.route('/api/organizations/<organization_name>/policies')
+def get_organization_policies(organization_name):
+    """Get all policies for a specific organization"""
+    try:
+        policies = policy_db.get_organization_policies(organization_name)
+        return jsonify({
+            'success': True,
+            'policies': policies
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Error fetching policies: {str(e)}'
+        }), 500
+
+@app.route('/api/organizations/<organization_name>/controls')
+def get_organization_controls(organization_name):
+    """Get all controls for a specific organization"""
+    try:
+        controls = policy_db.get_organization_controls(organization_name)
+        return jsonify({
+            'success': True,
+            'controls': controls
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Error fetching controls: {str(e)}'
+        }), 500
+
+@app.route('/api/organizations/<organization_name>/guides')
+def get_organization_guides(organization_name):
+    """Get all implementation guides for a specific organization"""
+    try:
+        guides = policy_db.get_organization_guides(organization_name)
+        return jsonify({
+            'success': True,
+            'guides': guides
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Error fetching guides: {str(e)}'
+        }), 500
+
+@app.route('/save_controls', methods=['POST'])
+@csrf.exempt
+def save_controls():
+    """Save generated controls to database"""
+    try:
+        data = request.get_json()
+        organization_name = data.get('organization_name', '')
+        controls_content = data.get('controls_content', '')
+        filename = data.get('filename', '')
+        
+        if not organization_name or not controls_content:
+            return jsonify({
+                'success': False,
+                'error': 'Organization name and controls content are required'
+            }), 400
+        
+        success = policy_db.save_controls(organization_name, controls_content, filename)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': 'Controls saved successfully'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to save controls'
+            }), 500
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Error saving controls: {str(e)}'
+        }), 500
+
+@app.route('/save_implementation_guide', methods=['POST'])
+@csrf.exempt
+def save_implementation_guide():
+    """Save generated implementation guide to database"""
+    try:
+        data = request.get_json()
+        organization_name = data.get('organization_name', '')
+        guide_content = data.get('guide_content', '')
+        filename = data.get('filename', '')
+        
+        if not organization_name or not guide_content:
+            return jsonify({
+                'success': False,
+                'error': 'Organization name and guide content are required'
+            }), 400
+        
+        success = policy_db.save_implementation_guide(organization_name, guide_content, filename)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': 'Implementation guide saved successfully'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to save implementation guide'
+            }), 500
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f'Error saving implementation guide: {str(e)}'
         }), 500
 
 if __name__ == '__main__':

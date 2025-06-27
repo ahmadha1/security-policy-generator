@@ -1,0 +1,419 @@
+{% extends "base.html" %}
+
+{% block title %}Policy Database - Saved Policies & Controls{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-12">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary mb-3">
+                <i class="fas fa-database"></i>
+                Policy Database
+            </h1>
+            <p class="lead text-muted mb-4">
+                View and manage all saved policies, controls, and implementation guides organized by organization.
+            </p>
+        </div>
+
+        <!-- Organizations List -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-building"></i>
+                    Organizations
+                </h3>
+            </div>
+            <div class="card-body">
+                <div id="organizationsList">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Loading organizations...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Organization Details Modal -->
+        <div class="modal fade" id="organizationModal" tabindex="-1" aria-labelledby="organizationModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="organizationModalLabel">
+                            <i class="fas fa-building"></i>
+                            <span id="modalOrgName"></span>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Organization Info -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-industry"></i> Industries</h6>
+                                <div id="modalIndustries"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-certificate"></i> Frameworks</h6>
+                                <div id="modalFrameworks"></div>
+                            </div>
+                        </div>
+
+                        <!-- Tabs for different content types -->
+                        <ul class="nav nav-tabs" id="contentTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="policies-tab" data-bs-toggle="tab" data-bs-target="#policies" type="button" role="tab">
+                                    <i class="fas fa-file-contract"></i> Policies
+                                    <span class="badge bg-primary ms-1" id="policiesCount">0</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="controls-tab" data-bs-toggle="tab" data-bs-target="#controls" type="button" role="tab">
+                                    <i class="fas fa-cogs"></i> Controls
+                                    <span class="badge bg-info ms-1" id="controlsCount">0</span>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="guides-tab" data-bs-toggle="tab" data-bs-target="#guides" type="button" role="tab">
+                                    <i class="fas fa-road"></i> Implementation Guides
+                                    <span class="badge bg-warning ms-1" id="guidesCount">0</span>
+                                </button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content mt-3" id="contentTabContent">
+                            <!-- Policies Tab -->
+                            <div class="tab-pane fade show active" id="policies" role="tabpanel">
+                                <div id="policiesList">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="mt-2">Loading policies...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Controls Tab -->
+                            <div class="tab-pane fade" id="controls" role="tabpanel">
+                                <div id="controlsList">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-info" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="mt-2">Loading controls...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Guides Tab -->
+                            <div class="tab-pane fade" id="guides" role="tabpanel">
+                                <div id="guidesList">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-warning" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="mt-2">Loading guides...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Load organizations on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadOrganizations();
+});
+
+function loadOrganizations() {
+    fetch('/api/organizations')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayOrganizations(data.organizations);
+            } else {
+                showError('Error loading organizations: ' + data.error);
+            }
+        })
+        .catch(error => {
+            showError('Error loading organizations: ' + error.message);
+        });
+}
+
+function displayOrganizations(organizations) {
+    const container = document.getElementById('organizationsList');
+    
+    if (organizations.length === 0) {
+        container.innerHTML = `
+            <div class="text-center">
+                <i class="fas fa-inbox text-muted" style="font-size: 3rem;"></i>
+                <h5 class="mt-3 text-muted">No organizations found</h5>
+                <p class="text-muted">Generate your first policy to see it here.</p>
+                <a href="/" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Generate Policy
+                </a>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '<div class="row">';
+    
+    organizations.forEach(org => {
+        const createdDate = new Date(org.created_at).toLocaleDateString();
+        const updatedDate = new Date(org.updated_at).toLocaleDateString();
+        
+        html += `
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-building text-primary"></i>
+                            ${org.name}
+                        </h5>
+                        <p class="card-text">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar"></i> Created: ${createdDate}<br>
+                                <i class="fas fa-edit"></i> Updated: ${updatedDate}
+                            </small>
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group" role="group">
+                                <span class="badge bg-primary">${org.policy_count} Policies</span>
+                                <span class="badge bg-info">${org.controls_count} Controls</span>
+                                <span class="badge bg-warning">${org.guides_count} Guides</span>
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm" onclick="viewOrganization('${org.name}')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+function viewOrganization(organizationName) {
+    // Set modal title
+    document.getElementById('modalOrgName').textContent = organizationName;
+    
+    // Load organization details
+    loadOrganizationDetails(organizationName);
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('organizationModal'));
+    modal.show();
+}
+
+function loadOrganizationDetails(organizationName) {
+    // Load policies
+    loadOrganizationPolicies(organizationName);
+    
+    // Load controls
+    loadOrganizationControls(organizationName);
+    
+    // Load guides
+    loadOrganizationGuides(organizationName);
+}
+
+function loadOrganizationPolicies(organizationName) {
+    fetch(`/api/organizations/${encodeURIComponent(organizationName)}/policies`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayPolicies(data.policies);
+                document.getElementById('policiesCount').textContent = data.policies.length;
+            } else {
+                document.getElementById('policiesList').innerHTML = '<p class="text-danger">Error loading policies</p>';
+            }
+        })
+        .catch(error => {
+            document.getElementById('policiesList').innerHTML = '<p class="text-danger">Error loading policies</p>';
+        });
+}
+
+function loadOrganizationControls(organizationName) {
+    fetch(`/api/organizations/${encodeURIComponent(organizationName)}/controls`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayControls(data.controls);
+                document.getElementById('controlsCount').textContent = data.controls.length;
+            } else {
+                document.getElementById('controlsList').innerHTML = '<p class="text-danger">Error loading controls</p>';
+            }
+        })
+        .catch(error => {
+            document.getElementById('controlsList').innerHTML = '<p class="text-danger">Error loading controls</p>';
+        });
+}
+
+function loadOrganizationGuides(organizationName) {
+    fetch(`/api/organizations/${encodeURIComponent(organizationName)}/guides`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayGuides(data.guides);
+                document.getElementById('guidesCount').textContent = data.guides.length;
+            } else {
+                document.getElementById('guidesList').innerHTML = '<p class="text-danger">Error loading guides</p>';
+            }
+        })
+        .catch(error => {
+            document.getElementById('guidesList').innerHTML = '<p class="text-danger">Error loading guides</p>';
+        });
+}
+
+function displayPolicies(policies) {
+    const container = document.getElementById('policiesList');
+    
+    if (policies.length === 0) {
+        container.innerHTML = '<p class="text-muted">No policies found for this organization.</p>';
+        return;
+    }
+    
+    let html = '';
+    policies.forEach(policy => {
+        const generatedDate = new Date(policy.generated_at).toLocaleString();
+        const contentPreview = policy.content.substring(0, 200) + '...';
+        
+        html += `
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0">
+                            <i class="fas fa-file-contract"></i>
+                            ${policy.filename || 'Policy'}
+                        </h6>
+                        <small class="text-muted">
+                            Generated: ${generatedDate} | Type: ${policy.generator_type}
+                        </small>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="downloadContent('${policy.content.replace(/'/g, "\\'")}', '${policy.filename || 'policy.md'}')">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                </div>
+                <div class="card-body">
+                    <pre class="bg-light p-3 rounded" style="max-height: 200px; overflow-y: auto;">${contentPreview}</pre>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function displayControls(controls) {
+    const container = document.getElementById('controlsList');
+    
+    if (controls.length === 0) {
+        container.innerHTML = '<p class="text-muted">No controls found for this organization.</p>';
+        return;
+    }
+    
+    let html = '';
+    controls.forEach(control => {
+        const generatedDate = new Date(control.generated_at).toLocaleString();
+        const contentPreview = control.content.substring(0, 200) + '...';
+        
+        html += `
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0">
+                            <i class="fas fa-cogs"></i>
+                            ${control.filename || 'Controls'}
+                        </h6>
+                        <small class="text-muted">
+                            Generated: ${generatedDate}
+                        </small>
+                    </div>
+                    <button class="btn btn-info btn-sm" onclick="downloadContent('${control.content.replace(/'/g, "\\'")}', '${control.filename || 'controls.md'}')">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                </div>
+                <div class="card-body">
+                    <pre class="bg-light p-3 rounded" style="max-height: 200px; overflow-y: auto;">${contentPreview}</pre>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function displayGuides(guides) {
+    const container = document.getElementById('guidesList');
+    
+    if (guides.length === 0) {
+        container.innerHTML = '<p class="text-muted">No implementation guides found for this organization.</p>';
+        return;
+    }
+    
+    let html = '';
+    guides.forEach(guide => {
+        const generatedDate = new Date(guide.generated_at).toLocaleString();
+        const contentPreview = guide.content.substring(0, 200) + '...';
+        
+        html += `
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0">
+                            <i class="fas fa-road"></i>
+                            ${guide.filename || 'Implementation Guide'}
+                        </h6>
+                        <small class="text-muted">
+                            Generated: ${generatedDate}
+                        </small>
+                    </div>
+                    <button class="btn btn-warning btn-sm" onclick="downloadContent('${guide.content.replace(/'/g, "\\'")}', '${guide.filename || 'implementation_guide.md'}')">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                </div>
+                <div class="card-body">
+                    <pre class="bg-light p-3 rounded" style="max-height: 200px; overflow-y: auto;">${contentPreview}</pre>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function downloadContent(content, filename) {
+    const blob = new Blob([content], { type: 'text/markdown' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+}
+
+function showError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'alert alert-danger alert-dismissible fade show';
+    errorDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.querySelector('.container').insertBefore(errorDiv, document.querySelector('.row'));
+}
+</script>
+{% endblock %} 
