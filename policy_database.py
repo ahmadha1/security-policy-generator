@@ -34,6 +34,7 @@ class PolicyDatabase:
                     industry TEXT,
                     framework TEXT,
                     organization_size TEXT,
+                    countries TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
@@ -79,8 +80,11 @@ class PolicyDatabase:
             conn.commit()
     
     def save_organization(self, name: str, industry: List[str], framework: List[str], 
-                         organization_size: str = "") -> int:
+                         organization_size: str = "", countries: Optional[List[str]] = None) -> int:
         """Save or update organization information"""
+        if countries is None:
+            countries = []
+            
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             
@@ -92,16 +96,16 @@ class PolicyDatabase:
                 # Update existing organization
                 cursor.execute('''
                     UPDATE organizations 
-                    SET industry = ?, framework = ?, organization_size = ?, updated_at = CURRENT_TIMESTAMP
+                    SET industry = ?, framework = ?, organization_size = ?, countries = ?, updated_at = CURRENT_TIMESTAMP
                     WHERE name = ?
-                ''', (json.dumps(industry), json.dumps(framework), organization_size, name))
+                ''', (json.dumps(industry), json.dumps(framework), organization_size, json.dumps(countries), name))
                 return existing[0]
             else:
                 # Create new organization
                 cursor.execute('''
-                    INSERT INTO organizations (name, industry, framework, organization_size)
-                    VALUES (?, ?, ?, ?)
-                ''', (name, json.dumps(industry), json.dumps(framework), organization_size))
+                    INSERT INTO organizations (name, industry, framework, organization_size, countries)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (name, json.dumps(industry), json.dumps(framework), organization_size, json.dumps(countries)))
                 return cursor.lastrowid or 0
     
     def save_policy(self, organization_name: str, policy_content: str, 
@@ -161,7 +165,7 @@ class PolicyDatabase:
             cursor = conn.cursor()
             cursor.execute('''
                 SELECT 
-                    o.id, o.name, o.industry, o.framework, o.organization_size,
+                    o.id, o.name, o.industry, o.framework, o.organization_size, o.countries,
                     o.created_at, o.updated_at,
                     COUNT(p.id) as policy_count,
                     COUNT(c.id) as controls_count,
@@ -184,11 +188,12 @@ class PolicyDatabase:
                     'industry': json.loads(row[2]) if row[2] else [],
                     'framework': json.loads(row[3]) if row[3] else [],
                     'organization_size': row[4],
-                    'created_at': row[5],
-                    'updated_at': row[6],
-                    'policy_count': row[7],
-                    'controls_count': row[8],
-                    'guides_count': row[9]
+                    'countries': json.loads(row[5]) if row[5] else [],
+                    'created_at': row[6],
+                    'updated_at': row[7],
+                    'policy_count': row[8],
+                    'controls_count': row[9],
+                    'guides_count': row[10]
                 }
                 organizations.append(org)
             

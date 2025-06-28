@@ -17,18 +17,97 @@ class ClaudePolicyGenerator:
             raise ValueError("Claude API key is required. Set CLAUDE_API_KEY environment variable or pass api_key parameter.")
     
     def generate_policy(self, organization_name: str, industry: List[str], framework: List[str], 
-                       organization_size: str = '', additional_requirements: str = '') -> str:
+                       organization_size: str = '', additional_requirements: str = '', countries: Optional[List[str]] = None) -> str:
         """Generate a comprehensive security policy using Claude"""
         
-        # Create the prompt for Claude
-        prompt = self._create_policy_prompt(
-            organization_name, industry, framework, organization_size, additional_requirements
-        )
+        if countries is None:
+            countries = []
+            
+        # Build the prompt with country-specific considerations
+        prompt = f"""Generate a comprehensive security policy for {organization_name} that addresses the following requirements:
+
+**Organization Details:**
+- Name: {organization_name}
+- Industry: {', '.join(industry)}
+- Compliance Frameworks: {', '.join(framework)}
+- Organization Size: {organization_size}
+- Operating Countries: {', '.join(countries) if countries else 'Not specified'}
+
+**Additional Requirements:**
+{additional_requirements if additional_requirements else 'None specified'}
+
+**Country-Specific Considerations:**
+"""
         
-        # Generate policy using Claude
-        policy_content = self._call_claude_api(prompt)
+        # Add country-specific privacy law information
+        if countries:
+            country_laws = {
+                'US': 'CCPA, CPRA, COPPA, HIPAA, GLBA, SOX',
+                'EU': 'GDPR, ePrivacy Directive, NIS Directive',
+                'CA': 'PIPEDA, CASL, Provincial Privacy Laws',
+                'AU': 'Privacy Act 1988, Notifiable Data Breaches Scheme',
+                'UK': 'UK GDPR, Data Protection Act 2018',
+                'JP': 'APPI, Act on the Protection of Personal Information',
+                'SG': 'PDPA, Personal Data Protection Act',
+                'BR': 'LGPD, Lei Geral de Proteção de Dados',
+                'IN': 'DPDP Act, Digital Personal Data Protection Act',
+                'ZA': 'POPIA, Protection of Personal Information Act'
+            }
+            
+            for country in countries:
+                if country in country_laws:
+                    prompt += f"- {country}: Must comply with {country_laws[country]}\n"
+                else:
+                    prompt += f"- {country}: Must comply with local privacy and data protection laws\n"
+        else:
+            prompt += "- No specific countries specified\n"
         
-        return policy_content
+        prompt += f"""
+
+**Requirements:**
+1. Create a comprehensive security policy that addresses all selected frameworks: {', '.join(framework)}
+2. Include industry-specific controls for: {', '.join(industry)}
+3. Address data sovereignty and privacy law compliance for operating countries
+4. Include data localization and cross-border transfer requirements
+5. Provide clear roles and responsibilities
+6. Include incident management procedures
+7. Address compliance monitoring and audit requirements
+8. Make the policy practical and implementable for {organization_size} organizations
+
+**Format:**
+- Use Markdown formatting
+- Include clear section headers
+- Provide specific, actionable controls
+- Include compliance checklists where appropriate
+- Address both technical and procedural aspects
+
+Please generate a comprehensive, professional security policy that meets these requirements."""
+
+        try:
+            response = self.client.messages.create(
+                model=self.model,
+                max_tokens=4000,
+                temperature=0.3,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            
+            return response.content[0].text
+            
+        except Exception as e:
+            print(f"Error generating policy with Claude: {e}")
+            # Fallback to standard generator
+            from policy_generator import SecurityPolicyGenerator
+            standard_generator = SecurityPolicyGenerator()
+            return standard_generator.generate_policy(
+                organization_name=organization_name,
+                industry=industry,
+                framework=framework,
+                organization_size=organization_size,
+                additional_requirements=additional_requirements,
+                countries=countries
+            )
     
     def generate_controls(self, policy_content: str, framework: List[str], industry: List[str]) -> str:
         """Generate specific controls and implementation guidance based on the policy"""

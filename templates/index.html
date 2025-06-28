@@ -79,17 +79,30 @@
                                    placeholder="Enter your organization name" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="organization_size" class="form-label">
-                                <i class="fas fa-users"></i>
-                                Organization Size
-                            </label>
-                            <select class="form-select" id="organization_size" name="organization_size">
-                                <option value="">Select Organization Size</option>
-                                <option value="Small (1-50 employees)">Small (1-50 employees)</option>
-                                <option value="Medium (51-500 employees)">Medium (51-500 employees)</option>
-                                <option value="Large (501-5000 employees)">Large (501-5000 employees)</option>
-                                <option value="Enterprise (5000+ employees)">Enterprise (5000+ employees)</option>
-                            </select>
+                            <div class="mb-3">
+                                <label for="organization_size" class="form-label">
+                                    <i class="fas fa-users"></i> Organization Size
+                                </label>
+                                <select class="form-select" id="organization_size" name="organization_size" required>
+                                    <option value="">Select organization size</option>
+                                    <option value="Small (1-50 employees)">Small (1-50 employees)</option>
+                                    <option value="Medium (51-500 employees)">Medium (51-500 employees)</option>
+                                    <option value="Large (501-5000 employees)">Large (501-5000 employees)</option>
+                                    <option value="Enterprise (5000+ employees)">Enterprise (5000+ employees)</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="countries" class="form-label">
+                                    <i class="fas fa-globe"></i> Operating Countries <span class="text-muted">(Select all applicable)</span>
+                                </label>
+                                <select class="form-select" id="countries" name="countries" multiple>
+                                    <option value="">Loading countries...</option>
+                                </select>
+                                <div class="form-text">
+                                    Select all countries where your organization operates to ensure compliance with local privacy and data protection laws.
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -288,6 +301,7 @@ document.getElementById('policyForm').addEventListener('submit', async function(
     // Get multiple selected values
     const selectedIndustries = Array.from(document.getElementById('industry').selectedOptions).map(option => option.value);
     const selectedFrameworks = Array.from(document.getElementById('framework').selectedOptions).map(option => option.value);
+    const selectedCountries = Array.from(document.getElementById('countries').selectedOptions).map(option => option.value);
     
     // Validate selections
     if (selectedIndustries.length === 0) {
@@ -307,6 +321,7 @@ document.getElementById('policyForm').addEventListener('submit', async function(
         industry: selectedIndustries,
         framework: selectedFrameworks,
         organization_size: document.getElementById('organization_size').value,
+        countries: selectedCountries,
         additional_requirements: document.getElementById('additional_requirements').value
     };
     
@@ -457,7 +472,32 @@ document.getElementById('framework').addEventListener('change', function() {
 document.addEventListener('DOMContentLoaded', function() {
     updateSelectionCount(document.getElementById('industry'), document.querySelector('label[for="industry"]'));
     updateSelectionCount(document.getElementById('framework'), document.querySelector('label[for="framework"]'));
+    
+    // Load countries from API
+    loadCountries();
 });
+
+// Load countries from API
+async function loadCountries() {
+    try {
+        const response = await fetch('/api/countries');
+        const countries = await response.json();
+        
+        const countriesSelect = document.getElementById('countries');
+        countriesSelect.innerHTML = '<option value="">Select countries (optional)</option>';
+        
+        countries.forEach(country => {
+            const option = document.createElement('option');
+            option.value = country.code;
+            option.textContent = `${country.name} (${country.laws.join(', ')})`;
+            countriesSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error loading countries:', error);
+        const countriesSelect = document.getElementById('countries');
+        countriesSelect.innerHTML = '<option value="">Error loading countries</option>';
+    }
+}
 
 // Claude-powered features
 document.getElementById('generateControlsBtn').addEventListener('click', async function() {

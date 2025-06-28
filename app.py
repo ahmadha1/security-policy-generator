@@ -156,8 +156,9 @@ def generate_policy():
         framework = data.get('framework', [])
         organization_size = data.get('organization_size', '')
         additional_requirements = data.get('additional_requirements', '')
+        countries = data.get('countries', [])  # New field for countries
         
-        print(f"Extracted data - org: {organization_name}, industry: {industry}, framework: {framework}")  # Debug logging
+        print(f"Extracted data - org: {organization_name}, industry: {industry}, framework: {framework}, countries: {countries}")  # Debug logging
         
         # Validate required fields
         if not organization_name or not industry or not framework:
@@ -168,13 +169,15 @@ def generate_policy():
                 'error': error_msg
             }), 400
         
-        # Ensure industry and framework are lists
+        # Ensure industry, framework, and countries are lists
         if not isinstance(industry, list):
             industry = [industry] if industry else []
         if not isinstance(framework, list):
             framework = [framework] if framework else []
+        if not isinstance(countries, list):
+            countries = [countries] if countries else []
         
-        print(f"Processed data - industry: {industry}, framework: {framework}")  # Debug logging
+        print(f"Processed data - industry: {industry}, framework: {framework}, countries: {countries}")  # Debug logging
         
         # Use Claude generator if available, otherwise fall back to standard generator
         if claude_generator:
@@ -184,7 +187,8 @@ def generate_policy():
                 industry=industry,
                 framework=framework,
                 organization_size=organization_size,
-                additional_requirements=additional_requirements
+                additional_requirements=additional_requirements,
+                countries=countries
             )
         else:
             print("Using standard policy generator...")
@@ -193,7 +197,8 @@ def generate_policy():
                 industry=industry,
                 framework=framework,
                 organization_size=organization_size,
-                additional_requirements=additional_requirements
+                additional_requirements=additional_requirements,
+                countries=countries
             )
         
         print(f"Policy generated successfully, length: {len(policy_content)}")  # Debug logging
@@ -209,7 +214,8 @@ def generate_policy():
                 name=organization_name,
                 industry=industry,
                 framework=framework,
-                organization_size=organization_size
+                organization_size=organization_size,
+                countries=countries
             )
             policy_db.save_policy(
                 organization_name=organization_name,
@@ -374,6 +380,55 @@ def get_organization_sizes():
         'Enterprise (5000+ employees)'
     ]
     return jsonify(sizes)
+
+@app.route('/api/countries')
+def get_countries():
+    """Get available countries with their privacy laws"""
+    countries = [
+        {'code': 'US', 'name': 'United States', 'laws': ['CCPA', 'CPRA', 'COPPA', 'HIPAA', 'GLBA', 'SOX']},
+        {'code': 'EU', 'name': 'European Union', 'laws': ['GDPR', 'ePrivacy Directive', 'NIS Directive']},
+        {'code': 'CA', 'name': 'Canada', 'laws': ['PIPEDA', 'CASL', 'Provincial Privacy Laws']},
+        {'code': 'AU', 'name': 'Australia', 'laws': ['Privacy Act 1988', 'Notifiable Data Breaches Scheme']},
+        {'code': 'UK', 'name': 'United Kingdom', 'laws': ['UK GDPR', 'Data Protection Act 2018']},
+        {'code': 'JP', 'name': 'Japan', 'laws': ['APPI', 'Act on the Protection of Personal Information']},
+        {'code': 'SG', 'name': 'Singapore', 'laws': ['PDPA', 'Personal Data Protection Act']},
+        {'code': 'BR', 'name': 'Brazil', 'laws': ['LGPD', 'Lei Geral de Proteção de Dados']},
+        {'code': 'IN', 'name': 'India', 'laws': ['DPDP Act', 'Digital Personal Data Protection Act']},
+        {'code': 'ZA', 'name': 'South Africa', 'laws': ['POPIA', 'Protection of Personal Information Act']},
+        {'code': 'MX', 'name': 'Mexico', 'laws': ['Federal Law on Protection of Personal Data']},
+        {'code': 'KR', 'name': 'South Korea', 'laws': ['PIPA', 'Personal Information Protection Act']},
+        {'code': 'CH', 'name': 'Switzerland', 'laws': ['FADP', 'Federal Act on Data Protection']},
+        {'code': 'NO', 'name': 'Norway', 'laws': ['Personal Data Act', 'GDPR Implementation']},
+        {'code': 'SE', 'name': 'Sweden', 'laws': ['GDPR Implementation', 'Swedish Data Protection Act']},
+        {'code': 'DE', 'name': 'Germany', 'laws': ['GDPR Implementation', 'BDSG', 'German Data Protection Act']},
+        {'code': 'FR', 'name': 'France', 'laws': ['GDPR Implementation', 'CNIL Guidelines']},
+        {'code': 'IT', 'name': 'Italy', 'laws': ['GDPR Implementation', 'Italian Privacy Code']},
+        {'code': 'ES', 'name': 'Spain', 'laws': ['GDPR Implementation', 'LOPDGDD']},
+        {'code': 'NL', 'name': 'Netherlands', 'laws': ['GDPR Implementation', 'Dutch Data Protection Act']},
+        {'code': 'BE', 'name': 'Belgium', 'laws': ['GDPR Implementation', 'Belgian Privacy Commission']},
+        {'code': 'AT', 'name': 'Austria', 'laws': ['GDPR Implementation', 'Austrian Data Protection Act']},
+        {'code': 'DK', 'name': 'Denmark', 'laws': ['GDPR Implementation', 'Danish Data Protection Act']},
+        {'code': 'FI', 'name': 'Finland', 'laws': ['GDPR Implementation', 'Finnish Data Protection Act']},
+        {'code': 'IE', 'name': 'Ireland', 'laws': ['GDPR Implementation', 'Irish Data Protection Act']},
+        {'code': 'PT', 'name': 'Portugal', 'laws': ['GDPR Implementation', 'Portuguese Data Protection Act']},
+        {'code': 'PL', 'name': 'Poland', 'laws': ['GDPR Implementation', 'Polish Data Protection Act']},
+        {'code': 'CZ', 'name': 'Czech Republic', 'laws': ['GDPR Implementation', 'Czech Data Protection Act']},
+        {'code': 'HU', 'name': 'Hungary', 'laws': ['GDPR Implementation', 'Hungarian Data Protection Act']},
+        {'code': 'RO', 'name': 'Romania', 'laws': ['GDPR Implementation', 'Romanian Data Protection Act']},
+        {'code': 'BG', 'name': 'Bulgaria', 'laws': ['GDPR Implementation', 'Bulgarian Data Protection Act']},
+        {'code': 'HR', 'name': 'Croatia', 'laws': ['GDPR Implementation', 'Croatian Data Protection Act']},
+        {'code': 'SI', 'name': 'Slovenia', 'laws': ['GDPR Implementation', 'Slovenian Data Protection Act']},
+        {'code': 'SK', 'name': 'Slovakia', 'laws': ['GDPR Implementation', 'Slovak Data Protection Act']},
+        {'code': 'LT', 'name': 'Lithuania', 'laws': ['GDPR Implementation', 'Lithuanian Data Protection Act']},
+        {'code': 'LV', 'name': 'Latvia', 'laws': ['GDPR Implementation', 'Latvian Data Protection Act']},
+        {'code': 'EE', 'name': 'Estonia', 'laws': ['GDPR Implementation', 'Estonian Data Protection Act']},
+        {'code': 'MT', 'name': 'Malta', 'laws': ['GDPR Implementation', 'Maltese Data Protection Act']},
+        {'code': 'CY', 'name': 'Cyprus', 'laws': ['GDPR Implementation', 'Cypriot Data Protection Act']},
+        {'code': 'LU', 'name': 'Luxembourg', 'laws': ['GDPR Implementation', 'Luxembourg Data Protection Act']},
+        {'code': 'GR', 'name': 'Greece', 'laws': ['GDPR Implementation', 'Greek Data Protection Act']},
+        {'code': 'OTHER', 'name': 'Other Countries', 'laws': ['Local Privacy Laws', 'Industry Standards']}
+    ]
+    return jsonify(countries)
 
 @app.route('/generate_controls', methods=['POST'])
 @csrf.exempt

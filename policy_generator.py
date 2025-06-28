@@ -409,9 +409,12 @@ class SecurityPolicyGenerator:
         }
     
     def generate_policy(self, organization_name: str, industry: List[str], framework: List[str], 
-                       organization_size: str = '', additional_requirements: str = '') -> str:
+                       organization_size: str = '', additional_requirements: str = '', countries: Optional[List[str]] = None) -> str:
         """Generate a comprehensive security policy"""
         
+        if countries is None:
+            countries = []
+            
         # Validate frameworks
         for fw in framework:
             if fw not in self.frameworks:
@@ -427,20 +430,21 @@ class SecurityPolicyGenerator:
                 industry_infos[ind] = self.industry_requirements[ind]
         
         # Generate policy content
-        policy_content = self._generate_policy_header(organization_name, framework_infos)
-        policy_content += self._generate_executive_summary(organization_name, framework_infos, industry)
-        policy_content += self._generate_scope_and_objectives(framework_infos, industry)
+        policy_content = self._generate_policy_header(organization_name, framework_infos, countries)
+        policy_content += self._generate_executive_summary(organization_name, framework_infos, industry, countries)
+        policy_content += self._generate_scope_and_objectives(framework_infos, industry, countries)
         policy_content += self._generate_roles_and_responsibilities(organization_size)
         policy_content += self._generate_risk_management(industry_infos)
         policy_content += self._generate_controls_section(framework_infos, industry_infos)
+        policy_content += self._generate_data_sovereignty_section(countries)
         policy_content += self._generate_incident_management()
-        policy_content += self._generate_compliance_and_monitoring(framework_infos)
+        policy_content += self._generate_compliance_and_monitoring(framework_infos, countries)
         policy_content += self._generate_additional_requirements(additional_requirements)
         policy_content += self._generate_policy_maintenance()
         
         return policy_content
     
-    def _generate_policy_header(self, organization_name: str, framework_infos: List[Dict]) -> str:
+    def _generate_policy_header(self, organization_name: str, framework_infos: List[Dict], countries: List[str]) -> str:
         """Generate the policy header section"""
         frameworks = ", ".join([fw['name'] for fw in framework_infos])
         return f"""# {organization_name} Security Policy
@@ -457,7 +461,7 @@ class SecurityPolicyGenerator:
 
 """
     
-    def _generate_executive_summary(self, organization_name: str, framework_infos: List[Dict], industry: List[str]) -> str:
+    def _generate_executive_summary(self, organization_name: str, framework_infos: List[Dict], industry: List[str], countries: List[str]) -> str:
         """Generate the executive summary section"""
         frameworks = ", ".join([fw['name'] for fw in framework_infos])
         industries = ", ".join(industry)
@@ -475,17 +479,20 @@ This security policy document establishes the framework for {organization_name}'
 ### Scope:
 This policy applies to all employees, contractors, vendors, and third-party service providers who have access to {organization_name}'s information systems, data, or facilities.
 
+### Country-Specific Considerations
+- {", ".join([f"**{country}**: {self.industry_requirements[country]['description']}" for country in countries])}
+
 ---
 
 """
     
-    def _generate_scope_and_objectives(self, framework_infos: List[Dict], industry: List[str]) -> str:
+    def _generate_scope_and_objectives(self, framework_infos: List[Dict], industry: List[str], countries: List[str]) -> str:
         """Generate the scope and objectives section"""
         frameworks = ", ".join([fw['name'] for fw in framework_infos])
         industries = ", ".join(industry)
         
         # Generate industry-specific scope details
-        industry_scope_details = self._generate_industry_scope_details(industry)
+        industry_scope_details = self._generate_industry_scope_details(industry, countries)
         
         return f"""## Scope and Objectives
 
@@ -512,10 +519,13 @@ This policy is tailored to address the unique security requirements of the follo
 
 {industry_scope_details}
 
+### Country-Specific Considerations
+- {", ".join([f"**{country}**: {self.industry_requirements[country]['description']}" for country in countries])}
+
 ---
 """
     
-    def _generate_industry_scope_details(self, industries: List[str]) -> str:
+    def _generate_industry_scope_details(self, industries: List[str], countries: List[str]) -> str:
         """Generate detailed industry-specific scope information"""
         industry_details = {
             'Technology/Software': {
@@ -745,6 +755,95 @@ The following controls are implemented based on {', '.join([fw['name'] for fw in
         
         return controls_text
     
+    def _generate_data_sovereignty_section(self, countries: List[str]) -> str:
+        """Generate data sovereignty and privacy law compliance section"""
+        if not countries:
+            return ""
+            
+        # Define country-specific privacy laws and requirements
+        country_laws = {
+            'US': {
+                'laws': ['CCPA', 'CPRA', 'COPPA', 'HIPAA', 'GLBA', 'SOX'],
+                'requirements': [
+                    'Data localization requirements for certain industries',
+                    'Consumer privacy rights and opt-out mechanisms',
+                    'Healthcare data protection under HIPAA',
+                    'Financial data protection under GLBA',
+                    'Children\'s online privacy protection under COPPA'
+                ]
+            },
+            'EU': {
+                'laws': ['GDPR', 'ePrivacy Directive', 'NIS Directive'],
+                'requirements': [
+                    'Right to be forgotten and data portability',
+                    'Explicit consent for data processing',
+                    'Data protection impact assessments (DPIAs)',
+                    'Cross-border data transfer restrictions',
+                    'Breach notification within 72 hours'
+                ]
+            },
+            'CA': {
+                'laws': ['PIPEDA', 'CASL', 'Provincial Privacy Laws'],
+                'requirements': [
+                    'Meaningful consent for data collection',
+                    'Data residency requirements for government contracts',
+                    'Anti-spam legislation compliance',
+                    'Provincial privacy law variations'
+                ]
+            },
+            'AU': {
+                'laws': ['Privacy Act 1988', 'Notifiable Data Breaches Scheme'],
+                'requirements': [
+                    'Australian Privacy Principles (APPs)',
+                    'Mandatory breach notification',
+                    'Data localization for government data',
+                    'Cross-border disclosure restrictions'
+                ]
+            },
+            'UK': {
+                'laws': ['UK GDPR', 'Data Protection Act 2018'],
+                'requirements': [
+                    'UK-specific data protection requirements',
+                    'Adequacy decisions for international transfers',
+                    'ICO enforcement and guidance compliance',
+                    'Brexit-related data transfer considerations'
+                ]
+            }
+        }
+        
+        section_content = "\n## Data Sovereignty and Privacy Law Compliance\n\n"
+        section_content += "This section addresses data sovereignty requirements and privacy law compliance for the countries where the organization operates.\n\n"
+        
+        for country in countries:
+            if country in country_laws:
+                laws = country_laws[country]
+                section_content += f"### {country} Compliance Requirements\n\n"
+                section_content += f"**Applicable Laws:** {', '.join(laws['laws'])}\n\n"
+                section_content += "**Key Requirements:**\n"
+                for req in laws['requirements']:
+                    section_content += f"- {req}\n"
+                section_content += "\n"
+            else:
+                section_content += f"### {country} Compliance Requirements\n\n"
+                section_content += "**Note:** This organization operates in jurisdictions with local privacy and data protection laws. "
+                section_content += "Compliance with applicable local regulations is required.\n\n"
+        
+        section_content += "### Data Localization and Transfer Requirements\n\n"
+        section_content += "- **Data Residency:** Ensure data is stored in compliance with local data residency requirements\n"
+        section_content += "- **Cross-border Transfers:** Implement appropriate safeguards for international data transfers\n"
+        section_content += "- **Local Representatives:** Appoint local representatives where required by law\n"
+        section_content += "- **Regulatory Reporting:** Maintain records and reporting mechanisms for regulatory authorities\n\n"
+        
+        section_content += "### Implementation Guidelines\n\n"
+        section_content += "1. **Data Mapping:** Maintain comprehensive data flow maps for all jurisdictions\n"
+        section_content += "2. **Consent Management:** Implement country-specific consent mechanisms\n"
+        section_content += "3. **Breach Response:** Establish jurisdiction-specific breach notification procedures\n"
+        section_content += "4. **Audit Trails:** Maintain detailed audit trails for compliance verification\n"
+        section_content += "5. **Training:** Provide country-specific privacy training to employees\n\n"
+        
+        section_content += "---\n"
+        return section_content
+    
     def _generate_incident_management(self) -> str:
         """Generate the incident management section"""
         return """## Incident Management
@@ -774,7 +873,7 @@ The following controls are implemented based on {', '.join([fw['name'] for fw in
 
 """
     
-    def _generate_compliance_and_monitoring(self, framework_infos: List[Dict]) -> str:
+    def _generate_compliance_and_monitoring(self, framework_infos: List[Dict], countries: List[str]) -> str:
         """Generate the compliance and monitoring section"""
         frameworks = ", ".join([fw['name'] for fw in framework_infos])
         return f"""## Compliance and Monitoring
@@ -799,6 +898,9 @@ The following controls are implemented based on {', '.join([fw['name'] for fw in
 - Third-party security audits
 - Management review meetings
 - Continuous improvement processes
+
+### Country-Specific Considerations
+- {", ".join([f"**{country}**: {self.industry_requirements[country]['description']}" for country in countries])}
 
 ---
 
