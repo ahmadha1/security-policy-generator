@@ -220,6 +220,8 @@ def generate_policy():
             print(f"Policy saved to database for organization: {organization_name}")
         except Exception as e:
             print(f"Warning: Could not save policy to database: {e}")
+            import traceback
+            traceback.print_exc()
         
         return jsonify({
             'success': True,

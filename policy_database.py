@@ -11,9 +11,14 @@ from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 
 class PolicyDatabase:
-    def __init__(self, db_path: str = "policy_tracker.db"):
+    def __init__(self, db_path: Optional[str] = None):
         """Initialize the policy database"""
-        self.db_path = db_path
+        if db_path is None:
+            # Use absolute path to ensure we always use the correct database
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            self.db_path = os.path.join(current_dir, "policy_tracker.db")
+        else:
+            self.db_path = db_path
         self.init_database()
     
     def init_database(self):
